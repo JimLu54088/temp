@@ -1,0 +1,34 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedWriter;
+
+public class ProcessTextFile {
+    public static void main(String[] args) {
+        String inputFileName = "input.txt"; // 替换成你的输入文本文件的路径
+        String outputFileName = "output.txt"; // 新的输出文本文件路径
+
+        try (BufferedReader br = new BufferedReader(new FileReader(inputFileName));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // 按逗号分割每一行
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String orderkey = parts[0].trim();
+                    String storeno = parts[1].trim();
+
+                    // 根据你的格式创建SQL语句
+                    String sqlStatement = "update payment_information set storeno = '" + storeno + "' where orderkey = '" + orderkey + "'";
+                    
+                    // 写入到输出文件
+                    bw.write(sqlStatement);
+                    bw.newLine(); // 换行
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
