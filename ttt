@@ -1,34 +1,25 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.BufferedWriter;
-
-public class ProcessTextFile {
-    public static void main(String[] args) {
-        String inputFileName = "input.txt"; // 替换成你的输入文本文件的路径
-        String outputFileName = "output.txt"; // 新的输出文本文件路径
-
-        try (BufferedReader br = new BufferedReader(new FileReader(inputFileName));
-             BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                // 按逗号分割每一行
-                String[] parts = line.split(",");
-                if (parts.length == 2) {
-                    String orderkey = parts[0].trim();
-                    String storeno = parts[1].trim();
-
-                    // 根据你的格式创建SQL语句
-                    String sqlStatement = "update payment_information set storeno = '" + storeno + "' where orderkey = '" + orderkey + "'";
-                    
-                    // 写入到输出文件
-                    bw.write(sqlStatement);
-                    bw.newLine(); // 换行
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
+Sub DeleteRowsByShopCode()
+    Dim ws As Worksheet
+    Dim shopList As Range
+    Dim cell As Range
+    Dim lastRow As Long
+    Dim shopCodeColumn As Long
+    
+    ' 设置工作表和要删除的shop_code列表范围
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' 替换为您的工作表名称
+    Set shopList = ThisWorkbook.Sheets("Sheet2").Range("A1:A10") ' 替换为您的shop_code列表范围
+    
+    ' 确定shop_code列的位置
+    shopCodeColumn = WorksheetFunction.Match("shop_code", ws.Rows(1), 0)
+    
+    ' 循环浏览工作表
+    lastRow = ws.Cells(ws.Rows.Count, shopCodeColumn).End(xlUp).Row
+    For i = lastRow To 2 Step -1 ' 从底部向上扫描，避免删除时的行偏移
+        Set cell = ws.Cells(i, shopCodeColumn)
+        ' 检查shop_code是否在列表中
+        If Not IsError(Application.Match(cell.Value, shopList, 0)) Then
+            ' 如果匹配，删除该行
+            ws.Rows(i).Delete
+        End If
+    Next i
+End Sub
